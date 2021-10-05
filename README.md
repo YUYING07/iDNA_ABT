@@ -4,5 +4,5 @@ You can change parameters in configuration/config.py to train models ,which sati
 
 Besides, dataset in paper "iDNA_ABT" is also included in data/DNA_MS.
 
-Our paper link: https://www.nature.com/articles/s41467-021-24313-3 
+Our paper link: https://doi.org/10.1093/bioinformatics/btab677
 
