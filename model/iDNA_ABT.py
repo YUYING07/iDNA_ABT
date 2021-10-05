@@ -3,7 +3,7 @@
 # @Author : yuying0711
 # @Email : 2539449171@qq.com
 # @IDE : PyCharm
-# @File : ACPred-LAF-Basic.py
+
 
 
 import torch
