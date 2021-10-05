@@ -1,5 +1,4 @@
 # ---encoding:utf-8---
-# @Time : 2021.03.03
 # @Author : yuying0711
 # @Email : 2539449171@qq.com
 # @IDE : PyCharm
