@@ -538,7 +538,7 @@ def load_config():
        '''
 
     '''Set the required variables in the configuration'''
-    train_name = 'ACPred-LAF'
+    train_name = 'iDNA_ABT'
     path_config_data = None
     path_train_data, path_test_data = select_dataset()
 
