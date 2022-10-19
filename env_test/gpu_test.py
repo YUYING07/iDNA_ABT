@@ -5,7 +5,7 @@
 # @File : gpu_test.py
 
 import torch
-import pynvml  # TODO 记得需要先安装该包才能运行
+import pynvml  # TODO  install pynvml before running
 
 print('GPU is_available', torch.cuda.is_available())
 

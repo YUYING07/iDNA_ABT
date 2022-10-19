@@ -18,7 +18,7 @@ print(z, z.device)
 
 if torch.cuda.is_available():
     # 选择GPU
-    torch.cuda.set_device(1)
+    torch.cuda.set_device(0)
     device = torch.device('cuda')
     print('device', device)
     y = torch.ones_like(x, device=device)

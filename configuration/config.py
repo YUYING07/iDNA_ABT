@@ -12,8 +12,8 @@ def get_train_config():
 
     # preoject setting
     parse.add_argument('-learn-name', type=str, default='iDNA_ABT_train', help='learn name')
-    parse.add_argument('-save-best', type=bool, default=False, help='if save parameters of the current best model ')
-    parse.add_argument('-threshold', type=float, default=0.80, help='save threshold')
+    parse.add_argument('-save-best', type=bool, default=True, help='if save parameters of the current best model ')
+    parse.add_argument('-threshold', type=float, default=0.70, help='save threshold')
 
     # model parameters
     parse.add_argument('-max-len', type=int, default=256, help='max length of input sequences')
@@ -34,8 +34,8 @@ def get_train_config():
     parse.add_argument('-epoch', type=int, default=100, help='number of iteration')  # 30
     parse.add_argument('-k-fold', type=int, default=-1, help='k in cross validation,-1 represents train-test approach')
     parse.add_argument('-num-class', type=int, default=2, help='number of classes')
-    # parse.add_argument('-cuda', type=bool, default=True, help='if use cuda')
-    parse.add_argument('-cuda', type=bool, default=False, help='if not use cuda')
+    parse.add_argument('-cuda', type=bool, default=True, help='if use cuda')
+    # parse.add_argument('-cuda', type=bool, default=False, help='if not use cuda')
     parse.add_argument('-device', type=int, default=0, help='device id')
     parse.add_argument('-interval-log', type=int, default=10,
                        help='how many batches have gone through to record the training performance')

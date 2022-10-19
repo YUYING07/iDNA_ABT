@@ -7,6 +7,7 @@
 import sys
 import os
 import pickle
+
 curPath = os.path.abspath(os.path.dirname(__file__))
 rootPath = os.path.split(curPath)[0]
 sys.path.append(rootPath)
@@ -14,7 +15,7 @@ sys.path.append(rootPath)
 from preprocess import data_loader, data_loader_kmer
 from configuration import config as cf
 from util import util_metric
-from model import iDNA_ABT
+from model import iDNA_ABT, TextCNN
 from train.model_operation import save_model, adjust_model
 from train.visualization import dimension_reduction, penultimate_feature_visulization
 
@@ -103,17 +104,17 @@ def draw_figure_train_test(config, fig_name):
     plt.figure(22, figsize=(16, 12))
     plt.subplots_adjust(wspace=0.2, hspace=0.3)
 
-    for i,e in enumerate(train_acc_record):
-        train_acc_record[i]= e.cpu().detach()
+    for i, e in enumerate(train_acc_record):
+        train_acc_record[i] = e.cpu().detach()
 
-    for i,e in enumerate(train_loss_record):
-        train_loss_record[i]= e.cpu().detach()
+    for i, e in enumerate(train_loss_record):
+        train_loss_record[i] = e.cpu().detach()
 
-    for i,e in enumerate(test_acc_record):
-        test_acc_record[i]= e.cpu().detach()
+    for i, e in enumerate(test_acc_record):
+        test_acc_record[i] = e.cpu().detach()
 
-    for i,e in enumerate(test_loss_record):
-        test_loss_record[i]= e.cpu().detach()
+    for i, e in enumerate(test_loss_record):
+        test_loss_record[i] = e.cpu().detach()
 
     plt.subplot(2, 2, 1)
     plt.title("Train Acc Curve", fontsize=23)
@@ -183,7 +184,7 @@ def get_val_loss(logits, label, criterion):
     # mul_p0 = logits[:, 0].mul(torch.log(logits[:, 0])).sum()/Q_sum
     # mul_p1 = logits[:, 1].mul(torch.log(logits[:, 1])).sum()/Q_sum
 
-    sum_loss = loss+get_entropy(logits)-get_cond_entropy(logits)
+    sum_loss = loss + get_entropy(logits) - get_cond_entropy(logits)
     return sum_loss[0]
 
 
@@ -254,8 +255,8 @@ def train_ACP(train_iter, valid_iter, test_iter, model, optimizer, criterion, co
                 # repres_list.extend(output.cpu().detach().numpy())
                 # label_list.extend(label.cpu().detach().numpy())
 
-            # loss = get_loss(logits, label, criterion)
-            loss = get_val_loss(logits, label, criterion)  # 加入信息熵
+            loss = get_loss(logits, label, criterion)
+            # loss = get_val_loss(logits, label, criterion)  # 加入信息熵
 
             optimizer.zero_grad()
             loss.backward()
@@ -297,19 +298,20 @@ def train_ACP(train_iter, valid_iter, test_iter, model, optimizer, criterion, co
 
         '''Periodic Test'''
         if test_iter and sum_epoch % config.interval_test == 0:
-            test_metric, test_loss, test_repres_list, test_label_list, test_roc_data, test_prc_data = periodic_test(test_iter,
-                                                                                      model,
-                                                                                      criterion,
-                                                                                      config,
-                                                                                      sum_epoch)
+            test_metric, test_loss, test_repres_list, test_label_list, test_roc_data, test_prc_data = periodic_test(
+                test_iter,
+                model,
+                criterion,
+                config,
+                sum_epoch)
 
             '''Periodic Save'''
             # save the model if specific conditions are met
             test_acc = test_metric[0]
             if test_acc > best_acc:
                 best_acc = test_acc
-                roc_path = config.species+'_roc.txt'
-                pr_path = config.species+'_pr.txt'
+                roc_path = config.species + '_roc.txt'
+                pr_path = config.species + '_pr.txt'
                 file = open(roc_path, "wb")
                 pickle.dump(test_roc_data, file)  # 保存list到文件
                 file.close()
@@ -461,6 +463,9 @@ def train_test(train_iter, test_iter, config):
     if config.model_name == 'iDNA_ABT':
         print('model_name', config.model_name)
         model = iDNA_ABT.BERT(config)
+    elif config.model_name == 'TextCNN':
+        print('model_name', config.model_name)
+        model = TextCNN.TextCNN(config)
 
     if config.cuda: model.cuda()
     adjust_model(model)
@@ -489,10 +494,10 @@ def select_dataset():
     # path_test_data = '../data/DNA_MS/tsv/5hmC/5hmC_H.sapiens/test.tsv'
     # path_train_data = '../data/DNA_MS/tsv/5hmC/5hmC_M.musculus/train.tsv'
     # path_test_data = '../data/DNA_MS/tsv/5hmC/5hmC_M.musculus/test.tsv'
-    # path_train_data = '../data/DNA_MS/tsv/4mC/4mC_C.equisetifolia/train.tsv'
-    # path_test_data = '../data/DNA_MS/tsv/4mC/4mC_C.equisetifolia/test.tsv'
-    path_train_data = '../data/DNA_MS/tsv/4mC/4mC_F.vesca/train.tsv'
-    path_test_data = '../data/DNA_MS/tsv/4mC/4mC_F.vesca/test.tsv'
+    path_train_data = '../data/DNA_MS/tsv/4mC/4mC_C.equisetifolia/train.tsv'
+    path_test_data = '../data/DNA_MS/tsv/4mC/4mC_C.equisetifolia/test.tsv'
+    # path_train_data = '../data/DNA_MS/tsv/4mC/4mC_F.vesca/train.tsv'
+    # path_test_data = '../data/DNA_MS/tsv/4mC/4mC_F.vesca/test.tsv'
     # path_train_data = '../data/DNA_MS/tsv/4mC/4mC_S.cerevisiae/train.tsv'
     # path_test_data = '../data/DNA_MS/tsv/4mC/4mC_S.cerevisiae/test.tsv'
     # path_train_data = '../data/DNA_MS/tsv/4mC/4mC_Tolypocladium/train.tsv'
@@ -551,15 +556,11 @@ def load_config():
     '''Modify default configuration'''
     # config.epoch = 50
 
-    '''Set other variables''' 
+    '''Set other variables'''
     # flooding method
     b = 0.06
     model_name = 'iDNA_ABT'
-
-    if model_name == 'iDNA_ABT':
-        if_multi_scaled = False
-    else:
-        if_multi_scaled = True
+    # model_name = 'TextCNN'
 
     '''initialize result folder'''
     result_folder = '../result/' + config.learn_name
@@ -572,7 +573,7 @@ def load_config():
     config.path_test_data = path_test_data
     config.species = path_train_data.replace('/train.tsv', '')
     config.b = b
-    config.if_multi_scaled = if_multi_scaled
+    config.if_multi_scaled = False
     config.model_name = model_name
     config.result_folder = result_folder
     config.train_data = path_train_data  # 方便保存图片
@@ -588,7 +589,7 @@ if __name__ == '__main__':
     config = load_config()
 
     '''set device'''
-    # torch.cuda.set_device(config.device)
+    torch.cuda.set_device(config.device)
 
     '''load data'''
     train_iter, test_iter = load_data(config)

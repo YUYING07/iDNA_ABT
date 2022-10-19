@@ -134,7 +134,6 @@ class BERT(nn.Module):
         for layer in self.layers:
             output = layer(output, enc_self_attn_mask)
             # output: [batch_size, max_len, d_model]
-
         # classification
         # only use [CLS]
         representation = output[:, 0, :]
